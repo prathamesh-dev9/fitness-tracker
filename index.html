@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Health & Calorie Tracker</title>
+  
+  <!-- Google Fonts: Inter for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tabler Icons via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="mobile-frame">
+  <div class="app">
+    <h2 class="sr-only">Advanced daily health and calorie tracker</h2>
+    
+    <!-- Premium visible app header -->
+    <header class="app-header">
+      <div>
+        <p class="app-date" id="header-date">Today</p>
+        <h1 class="app-title">Health Tracker</h1>
+      </div>
+      <div class="profile-badge" onclick="openSettingsModal()" aria-label="Open settings and backup" role="button">
+        <i class="ti ti-user-circle" aria-hidden="true"></i>
+      </div>
+    </header>
+
+    <div id="pg-calories" class="page active">
+      <div class="ring-wrap">
+        <svg class="ring" width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255, 255, 255, 0.06)" stroke-width="10"/>
+          <circle id="ring-arc" cx="80" cy="80" r="60" fill="none" stroke="var(--color-accent-teal)" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 80 80)"/>
+          <text id="ring-cal" x="80" y="74" text-anchor="middle" font-size="24" font-weight="700" fill="var(--color-text-primary)">0</text>
+          <text x="80" y="92" text-anchor="middle" font-size="11" fill="var(--color-text-secondary)" font-weight="400">of 1500 kcal</text>
+          <text id="ring-rem" x="80" y="108" text-anchor="middle" font-size="11" fill="var(--color-text-secondary)" font-weight="500">1500 left</text>
+        </svg>
+      </div>
+
+      <div class="macro-row">
+        <div class="macro-card">
+          <div class="macro-num" id="mc-p">0g</div>
+          <div class="macro-label">Protein</div>
+          <div class="macro-bar"><div class="macro-fill" id="mb-p" style="width:0%;background:var(--color-accent-blue)"></div></div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-num" id="mc-c">0g</div>
+          <div class="macro-label">Carbs</div>
+          <div class="macro-bar"><div class="macro-fill" id="mb-c" style="width:0%;background:var(--color-accent-orange)"></div></div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-num" id="mc-f">0g</div>
+          <div class="macro-label">Fat</div>
+          <div class="macro-bar"><div class="macro-fill" id="mb-f" style="width:0%;background:var(--color-accent-pink)"></div></div>
+        </div>
+      </div>
+
+      <div id="meals-container"></div>
+
+
+    </div>
+
+    <div id="pg-checklist" class="page">
+      <div class="section-hd"><i class="ti ti-salad" aria-hidden="true"></i> Meals & nutrition</div>
+      <div id="cl-meals"></div>
+      
+      <div class="section-hd"><i class="ti ti-droplet" aria-hidden="true"></i> Hydration</div>
+      <div id="cl-water"></div>
+      
+      <div class="section-hd"><i class="ti ti-barbell" aria-hidden="true"></i> Exercise</div>
+      <div id="cl-exercise"></div>
+      
+      <div class="section-hd"><i class="ti ti-battery-charging" aria-hidden="true"></i> Recovery</div>
+      <div id="cl-recovery"></div>
+      
+      <button class="btn-secondary" onclick="resetChecklist()"><i class="ti ti-refresh" aria-hidden="true"></i> Reset today</button>
+    </div>
+
+    <div id="pg-weight" class="page">
+      <div class="goal-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:6px;font-weight:500">
+          <span>Start: 80 kg</span><span id="wt-pct-lbl" style="color:var(--color-accent-teal)">0% to goal</span><span>Goal: 60 kg</span>
+        </div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-bar" style="width:0%"></div></div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-c"><div class="stat-n" id="wt-current">— kg</div><div class="stat-l">Current weight</div></div>
+        <div class="stat-c"><div class="stat-n" id="wt-lost">— kg</div><div class="stat-l">Total lost</div></div>
+      </div>
+      
+      <div class="wt-section">
+        <div style="font-size:13px;font-weight:600;color:var(--color-text-primary);display:flex;align-items:center;gap:6px">
+          <i class="ti ti-scale" aria-hidden="true" style="color:var(--color-accent-teal)"></i> Log weight
+        </div>
+        <div class="wt-row">
+          <input type="number" id="wt-input" placeholder="e.g. 79.5" step="0.1" min="40" max="200"/>
+          <button onclick="logWeight()">Save</button>
+        </div>
+      </div>
+      
+      <div class="section-hd"><i class="ti ti-history" aria-hidden="true"></i> History</div>
+      <div id="wt-history"></div>
+    </div>
+
+    <div id="pg-insights" class="page">
+      <div class="stats-grid">
+        <div class="stat-c"><div class="stat-n" id="ins-streak">0</div><div class="stat-l"><i class="ti ti-flame" aria-hidden="true" style="font-size:14px;color:var(--color-accent-orange)"></i> Day streak</div></div>
+        <div class="stat-c"><div class="stat-n" id="ins-days">0</div><div class="stat-l">Days tracked</div></div>
+        <div class="stat-c"><div class="stat-n" id="ins-avg">—</div><div class="stat-l">Avg kcal/day</div></div>
+        <div class="stat-c"><div class="stat-n" id="ins-deficit">—</div><div class="stat-l">Avg deficit</div></div>
+      </div>
+      
+      <div class="section-hd"><i class="ti ti-chart-bar" aria-hidden="true"></i> Weekly calorie trend</div>
+      <div id="weekly-chart" style="margin-bottom:1rem"></div>
+      
+      <div class="section-hd"><i class="ti ti-bulb" aria-hidden="true"></i> Tips for you</div>
+      <div id="tips-container"></div>
+      
+      <button class="btn-primary" onclick="sendPrompt('Give me personalized advice based on my weight loss goal from 80 kg to 60 kg, I am 26 years old male, 163 cm')">Get personalized advice ↗</button>
+    </div>
+  </div>
+
+  <!-- Polished bottom navigation bar suited for mobile devices -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('calories')" id="nb-calories"><i class="ti ti-flame" aria-hidden="true"></i>Calories</button>
+    <button class="nav-btn" onclick="showPage('checklist')" id="nb-checklist"><i class="ti ti-check" aria-hidden="true"></i>Checklist</button>
+    <button class="nav-btn" onclick="showPage('weight')" id="nb-weight"><i class="ti ti-scale" aria-hidden="true"></i>Weight</button>
+    <button class="nav-btn" onclick="showPage('insights')" id="nb-insights"><i class="ti ti-chart-bar" aria-hidden="true"></i>Insights</button>
+  </nav>
+
+  <!-- Add Food Bottom Sheet Modal -->
+  <div class="modal-backdrop" id="add-food-modal" onclick="closeAddFoodModal(event)">
+    <div class="picker-wrap" onclick="event.stopPropagation()">
+      <div style="width: 36px; height: 4px; background: rgba(255,255,255,0.18); border-radius: 2px; margin: 0 auto 16px; cursor: pointer;" onclick="closeAddFoodModal()"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px">
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;align-items:center;gap:6px">
+          <i class="ti ti-plus" aria-hidden="true" style="color:var(--color-accent-teal)"></i> Add Food to <span id="modal-meal-name" style="color:var(--color-accent-teal)">Breakfast</span>
+        </div>
+        <button onclick="closeAddFoodModal()" style="background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="search-row">
+        <input type="text" id="food-search" placeholder="Search Indian foods..." oninput="filterFoods()"/>
+        <select id="meal-target" style="display:none">
+          <option value="0">Breakfast</option>
+          <option value="1">Lunch</option>
+          <option value="2">Snack</option>
+          <option value="3">Dinner</option>
+        </select>
+      </div>
+      <div class="food-options" id="food-options"></div>
+      <div class="custom-row">
+        <input type="text" id="custom-name" placeholder="Custom food name"/>
+        <input type="number" id="custom-cal" placeholder="kcal" style="width:70px"/>
+        <button onclick="addCustom()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (File Export) -->
+  <div class="modal-backdrop" id="settings-modal" onclick="closeSettingsModal(event)">
+    <div class="picker-wrap" onclick="event.stopPropagation()" style="max-height: 90%; overflow-y: auto;">
+      <div style="width: 36px; height: 4px; background: rgba(255,255,255,0.18); border-radius: 2px; margin: 0 auto 16px; cursor: pointer;" onclick="closeSettingsModal()"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+        <div style="font-size:15px;font-weight:700;color:var(--color-text-primary);display:flex;align-items:center;gap:6px">
+          <i class="ti ti-settings" aria-hidden="true" style="color:var(--color-accent-teal)"></i> Settings & Backup
+        </div>
+        <button onclick="closeSettingsModal()" style="background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center"><i class="ti ti-x"></i></button>
+      </div>
+
+      <!-- Local Backup -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">
+          Local File Backup
+        </div>
+        <div style="display:flex; gap:8px">
+          <button onclick="exportToJSON()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; font-size:12px; font-weight:600; border:1px solid var(--color-border-tertiary); border-radius:var(--border-radius-sm); background:rgba(255,255,255,0.05); color:var(--color-text-primary); cursor:pointer">
+            <i class="ti ti-download"></i> Export Data
+          </button>
+          <label style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; font-size:12px; font-weight:600; border:1px solid var(--color-border-tertiary); border-radius:var(--border-radius-sm); background:rgba(255,255,255,0.05); color:var(--color-text-primary); cursor:pointer; text-align:center">
+            <i class="ti ti-upload"></i> Import Data
+            <input type="file" id="import-file" style="display:none; width: 0.1px; height: 0.1px;" onchange="importFromJSON(event)" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
